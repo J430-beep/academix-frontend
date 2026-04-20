@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register School - AcademiX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            margin: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Register Your School</h2>
+
+    <input id="name" placeholder="School Name">
+    <input id="shortcode" placeholder="MPESA Shortcode">
+    <input id="passkey" placeholder="MPESA Passkey">
+
+    <button onclick="register()">Register School</button>
+</div>
+
+<script>
+
+const API = "https://academix-backend-pe8o.onrender.com/api";
+
+async function register() {
+
+    try {
+
+        const name = document.getElementById("name").value;
+        const shortcode = document.getElementById("shortcode").value;
+        const passkey = document.getElementById("passkey").value;
+
+        if (!name || !shortcode || !passkey) {
+            alert("Fill all fields");
+            return;
+        }
+
+        const res = await fetch(API + "/schools/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name,
+                mpesa_shortcode: shortcode,
+                mpesa_passkey: passkey
+            })
+        });
+
+        const data = await res.json();
+
+        console.log("REGISTER RESPONSE:", data);
+
+        // ❌ stop if failed
+        if (!data.school_id) {
+            alert("Error: " + (data.error || "Registration failed"));
+            return;
+        }
+
+        // ✅ SAVE SCHOOL ID
+        localStorage.setItem("school_id", data.school_id);
+
+        // ✅ GET PLAN AMOUNT FROM URL
+        const params = new URLSearchParams(window.location.search);
+        const amount = params.get("amount") || 1000;
+
+        // ✅ OPTIONAL: SHOW PASSWORD LINK
+        if (data.link) {
+            alert("Set password using this link:\n\n" + data.link);
+        }
+
+        // ✅ REDIRECT TO PAYMENT
+        window.location.href =
+            "payment.html?school_id=" + data.school_id + "&amount=" + amount;
+
+    } catch (err) {
+        console.error(err);
+        alert("Server error");
+    }
+}
+
+</script>
+
+</body>
+</html>
