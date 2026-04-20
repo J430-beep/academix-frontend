@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcademiX Admin</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: #f4f6f9;
+}
+
+header {
+  background: #1a73e8;
+  color: white;
+  padding: 15px;
+}
+
+nav ul {
+  display: flex;
+  gap: 15px;
+  list-style: none;
+  padding: 0;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+}
+
+section {
+  background: white;
+  margin: 15px;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+button {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.card {
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin: 5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h2>AcademiX Admin Panel</h2>
+  <div id="user-bar"></div>
+
+  <nav>
+    <ul>
+      <li><a href="#students">Students</a></li>
+      <li><a href="#teachers">Teachers</a></li>
+      <li><a href="#exams">Exams</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#fees">Fees</a></li>
+      <li><a href="#finance">Finance</a></li>
+      <li><a href="#ai">AI</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+<!-- ================= STUDENTS ================= -->
+<section id="students">
+  <h3>Students</h3>
+
+  <button onclick="toggle('student-form')">Add Student</button>
+
+  <div id="student-form" class="hidden">
+    <input id="student-name" placeholder="Name">
+    <select id="student-class"></select>
+    <button onclick="addStudent()">Save</button>
+  </div>
+
+  <ul id="students-list"></ul>
+</section>
+
+<!-- ================= TEACHERS ================= -->
+<section id="teachers">
+  <h3>Teachers</h3>
+
+  <button onclick="toggle('teacher-form')">Add Teacher</button>
+
+  <div id="teacher-form" class="hidden">
+    <input id="teacher-name" placeholder="Name">
+    <select id="teacher-subject"></select>
+    <button onclick="addTeacher()">Save</button>
+  </div>
+
+  <ul id="teachers-list"></ul>
+</section>
+
+<!-- ================= EXAMS (PRO) ================= -->
+<section id="exams" class="feature-pro">
+  <h3>Exams (PRO)</h3>
+
+  <div id="pro-lock-exams" class="hidden">
+    <p>Upgrade to PRO to access Exams</p>
+  </div>
+
+  <div id="exams-content">
+    <button onclick="toggle('exam-form')">Add Exam</button>
+
+    <div id="exam-form" class="hidden">
+      <input id="exam-title" placeholder="Title">
+      <input type="date" id="exam-date">
+      <button onclick="addExam()">Save</button>
+    </div>
+
+    <ul id="exams-list"></ul>
+  </div>
+</section>
+
+<!-- ================= RESULTS (PRO) ================= -->
+<section id="results" class="feature-pro">
+  <h3>Results (PRO)</h3>
+
+  <div id="results-content">
+    <input id="result-marks" placeholder="Marks">
+    <button onclick="addResult()">Save</button>
+  </div>
+
+  <ul id="results-list"></ul>
+</section>
+
+<!-- ================= FEES ================= -->
+<section id="fees">
+  <h3>Fees</h3>
+
+  <input id="fee-amount" placeholder="Amount">
+  <button onclick="addFee()">Save</button>
+
+  <div style="margin-top:10px;border:1px solid #ddd;padding:10px;">
+    <h4>MPESA Payment</h4>
+    <input id="mpesa-phone" placeholder="2547XXXXXXXX">
+    <input id="mpesa-amount" placeholder="Amount">
+    <button onclick="triggerMpesaPayment()">Pay</button>
+  </div>
+
+  <ul id="fees-list"></ul>
+</section>
+
+<!-- ================= FINANCE ================= -->
+<section id="finance">
+  <h3>Finance</h3>
+  <button onclick="fetchMpesaPayments()">Refresh</button>
+  <ul id="mpesa-payments-list"></ul>
+</section>
+
+<!-- ================= AI (PREMIUM) ================= -->
+<section id="ai" class="feature-premium">
+  <h3>AI Analytics (PREMIUM)</h3>
+
+  <div id="ai-lock" class="hidden">
+    <p>Upgrade to PREMIUM to unlock AI Analytics</p>
+  </div>
+
+  <div id="ai-content">
+    <button onclick="fetchClassAnalytics()">Class AI</button>
+    <button onclick="fetchSubjectAnalytics()">Subject AI</button>
+    <div id="analytics-results"></div>
+  </div>
+</section>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast" style="
+position:fixed;
+bottom:20px;
+right:20px;
+background:#333;
+color:white;
+padding:10px;
+border-radius:6px;
+display:none;"></div>
+
+<script src="admin.js"></script>
+
+<script>
+// ================= AUTH CHECK =================
+const token = localStorage.getItem("token");
+if (!token) window.location.href = "login.html";
+
+// ================= PLAN SYSTEM =================
+const plan = localStorage.getItem("plan") || "basic";
+
+document.getElementById("user-bar").innerText =
+`Plan: ${plan}`;
+
+// LOCK FEATURES
+if (plan === "basic") {
+  document.getElementById("ai-lock").classList.remove("hidden");
+}
+
+if (!["pro","premium"].includes(plan)) {
+  document.getElementById("pro-lock-exams").classList.remove("hidden");
+}
+
+// ================= TOAST =================
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 3000);
+}
+
+// ================= TOGGLE =================
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle("hidden");
+}
+
+// ================= MPESA =================
+async function triggerMpesaPayment() {
+
+  const phone = document.getElementById("mpesa-phone").value;
+  const amount = document.getElementById("mpesa-amount").value;
+  const school_id = localStorage.getItem("school_id");
+
+  showToast("Sending STK...");
+
+  const res = await fetch("https://academix-backend-pe8o.onrender.com/api/mpesa/stkpush", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ school_id, phone, amount })
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    showToast("Check phone to complete payment");
+  } else {
+    showToast(data.error || "Failed");
+  }
+}
+</script>
+
+</body>
+</html>

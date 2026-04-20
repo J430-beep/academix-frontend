@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AcademiX Student Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Student Portal</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="#exams">Exams</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#fees">Fees</a></li>
+        <li><a href="#ai-tutor">AI Tutor</a></li>
+        <li><a href="#notifications">Notifications</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- EXAMS -->
+    <section id="exams">
+      <h2>Upcoming & Past Exams</h2>
+      <ul id="exams-list"></ul>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results">
+      <h2>Your Results</h2>
+      <ul id="results-list"></ul>
+    </section>
+
+    <!-- FEES -->
+    <section id="fees">
+      <h2>Your Fees</h2>
+      <ul id="fees-list"></ul>
+    </section>
+
+    <!-- AI TUTOR -->
+    <section id="ai-tutor">
+      <h2>Ask AI Tutor</h2>
+      <form id="ai-form">
+        <input type="text" id="question" placeholder="Ask a question..." required>
+        <button type="submit">Ask</button>
+      </form>
+      <ul id="ai-responses"></ul>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="notifications">
+      <h2>Notifications</h2>
+      <ul id="notifications-list"></ul>
+    </section>
+  </main>
+
+  <script src="js/student.js"></script>
+</body>
+</html>
