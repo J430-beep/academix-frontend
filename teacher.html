@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AcademiX Teacher Portal</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Teacher Portal</h1>
+    <nav>
+      <ul>
+        <li><a href="index.html">Dashboard</a></li>
+        <li><a href="#exams">Exams</a></li>
+        <li><a href="#results">Results</a></li>
+        <li><a href="#analytics">Analytics</a></li>
+        <li><a href="#notifications">Notifications</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- EXAMS MANAGEMENT -->
+    <section id="exams">
+      <h2>Manage Exams</h2>
+      <button onclick="showAddExamForm()">Add Exam</button>
+      <div id="add-exam-form" style="display:none;">
+        <input type="text" id="exam-title" placeholder="Exam Title" required>
+        <input type="text" id="exam-class" placeholder="Class" required>
+        <input type="text" id="exam-subject" placeholder="Subject" required>
+        <input type="date" id="exam-date" required>
+        <input type="url" id="exam-syllabus" placeholder="Syllabus Link">
+        <button onclick="addExam()">Save</button>
+      </div>
+      <ul id="exams-list"></ul>
+    </section>
+
+    <!-- RESULTS MANAGEMENT -->
+    <section id="results">
+      <h2>Manage Results</h2>
+      <ul id="results-list"></ul>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section id="analytics">
+      <h2>Student Analytics</h2>
+      <button onclick="fetchClassAnalytics()">Class Analytics</button>
+      <button onclick="fetchSubjectAnalytics()">Subject Analytics</button>
+      <div id="analytics-results"></div>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="notifications">
+      <h2>Send Notifications</h2>
+      <button onclick="showAddNotificationForm()">New Notification</button>
+      <div id="add-notification-form" style="display:none;">
+        <input type="text" id="notification-user" placeholder="User ID" required>
+        <input type="text" id="notification-title" placeholder="Title" required>
+        <textarea id="notification-message" placeholder="Message" required></textarea>
+        <select id="notification-category">
+          <option value="General">General</option>
+          <option value="Exam">Exam</option>
+          <option value="Fee">Fee</option>
+          <option value="AI Tutor">AI Tutor</option>
+        </select>
+        <button onclick="addNotification()">Send</button>
+      </div>
+      <ul id="notifications-list"></ul>
+    </section>
+  </main>
+
+  <script src="teacher.js"></script>
+</body>
+</html>

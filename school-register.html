@@ -1,0 +1,108 @@
+<h2>School Registration</h2>
+
+<link rel="stylesheet" href="css/style.css">
+
+<input id="name" placeholder="School Name">
+<input id="shortcode" placeholder="MPESA Shortcode">
+<input id="passkey" placeholder="MPESA Passkey">
+
+<button id="btn" onclick="register()">Register School</button>
+
+<p id="msg"></p>
+
+<script>
+const API = "https://academix-backend-pe8o.onrender.com/api";
+
+async function register() {
+
+    const btn = document.getElementById("btn");
+    const msg = document.getElementById("msg");
+
+    try {
+
+        // ===============================
+        // LOADING STATE (PRODUCTION STYLE)
+        // ===============================
+        btn.disabled = true;
+        btn.innerText = "Registering...";
+        msg.innerText = "";
+
+        const name = document.getElementById("name").value.trim();
+        const shortcode = document.getElementById("shortcode").value.trim();
+        const passkey = document.getElementById("passkey").value.trim();
+
+        // ===============================
+        // VALIDATION (FRONTEND SAFETY)
+        // ===============================
+        if (!name || !shortcode || !passkey) {
+            msg.innerText = "❌ All fields are required";
+            btn.disabled = false;
+            btn.innerText = "Register School";
+            return;
+        }
+
+        // ===============================
+        // API CALL
+        // ===============================
+        const res = await fetch(API + "/schools/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name,
+                mpesa_shortcode: shortcode,
+                mpesa_passkey: passkey
+            })
+        });
+
+        const data = await res.json();
+
+        console.log("SERVER RESPONSE:", data);
+
+        // ===============================
+        // ERROR HANDLING
+        // ===============================
+        if (!res.ok) {
+            msg.innerText = "❌ " + (data.error || "Registration failed");
+            btn.disabled = false;
+            btn.innerText = "Register School";
+            return;
+        }
+
+        // ===============================
+        // SUCCESS UI
+        // ===============================
+        msg.innerHTML = "✅ School created successfully!";
+
+        if (data.school_id) {
+            localStorage.setItem("school_id", data.school_id);
+        }
+
+        // ===============================
+        // SHOW SETUP LINK (NO ALERTS IN PROD)
+        // ===============================
+        if (data.link) {
+            msg.innerHTML += `<br><br>
+            🔐 Setup Account:<br>
+            <a href="${data.link}" target="_blank">Click here to set password</a>`;
+        }
+
+        // ===============================
+        // STOP AUTO REDIRECT (IMPORTANT FIX)
+        // ===============================
+        // DO NOT redirect immediately in SaaS onboarding
+        // User must complete setup first
+
+        btn.disabled = false;
+        btn.innerText = "Register School";
+
+    } catch (err) {
+
+        console.error(err);
+
+        msg.innerText = "❌ Server error. Try again.";
+
+        btn.disabled = false;
+        btn.innerText = "Register School";
+    }
+}
+</script>
