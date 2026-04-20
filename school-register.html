@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register School - AcademiX</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 420px;
+            margin: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: gray;
+        }
+
+        #msg {
+            margin-top: 10px;
+            font-size: 14px;
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+    <h2>Register Your School</h2>
+
+    <input id="name" placeholder="School Name">
+
+    <input id="shortcode" placeholder="MPESA Shortcode">
+
+    <input id="passkey" placeholder="MPESA Passkey">
+
+    <!-- IMPORTANT (your backend requires these) -->
+    <input id="consumer_key" placeholder="MPESA Consumer Key">
+
+    <input id="consumer_secret" placeholder="MPESA Consumer Secret">
+
+    <button id="btn" onclick="register()">Register School</button>
+
+    <p id="msg"></p>
+</div>
+
+<script>
+
+const API = "https://academix-backend-pe8o.onrender.com/api";
+
+async function register() {
+
+    const btn = document.getElementById("btn");
+    const msg = document.getElementById("msg");
+
+    try {
+        msg.innerText = "";
+        btn.disabled = true;
+        btn.innerText = "Registering...";
+
+        // INPUTS
+        const name = document.getElementById("name").value.trim();
+        const shortcode = document.getElementById("shortcode").value.trim();
+        const passkey = document.getElementById("passkey").value.trim();
+        const consumer_key = document.getElementById("consumer_key").value.trim();
+        const consumer_secret = document.getElementById("consumer_secret").value.trim();
+
+        // VALIDATION
+        if (!name || !shortcode || !passkey || !consumer_key || !consumer_secret) {
+            msg.innerText = "⚠️ Fill all fields (including MPESA API keys)";
+            btn.disabled = false;
+            btn.innerText = "Register School";
+            return;
+        }
+
+        // REQUEST
+        const res = await fetch(API + "/schools/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                name,
+                mpesa_shortcode: shortcode,
+                mpesa_passkey: passkey,
+                consumer_key,
+                consumer_secret
+            })
+        });
+
+        const data = await res.json();
+        console.log("REGISTER RESPONSE:", data);
+
+        // HANDLE ERROR
+        if (!res.ok) {
+            msg.innerText = data.error || "Registration failed";
+            btn.disabled = false;
+            btn.innerText = "Register School";
+            return;
+        }
+
+        if (!data.school_id) {
+            msg.innerText = "School created but ID missing";
+            return;
+        }
+
+        // SAVE SCHOOL
+        localStorage.setItem("school_id", data.school_id);
+
+        // PLAN AMOUNT (optional)
+        const params = new URLSearchParams(window.location.search);
+        const amount = params.get("amount") || 1000;
+
+        // SUCCESS MESSAGE
+        msg.style.color = "green";
+        msg.innerText = "School created successfully! Redirecting...";
+
+        // optional password link
+        if (data.link) {
+            alert("Set admin password:\n\n" + data.link);
+        }
+
+        // REDIRECT TO PAYMENT
+        setTimeout(() => {
+            window.location.href =
+                "payment.html?school_id=" + data.school_id + "&amount=" + amount;
+        }, 1000);
+
+    } catch (err) {
+        console.error(err);
+        msg.innerText = "Server error. Try again.";
+
+        btn.disabled = false;
+        btn.innerText = "Register School";
+    }
+}
+
+</script>
+
+</body>
+</html>
