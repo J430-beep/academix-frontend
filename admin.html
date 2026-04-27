@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AcademiX Admin</title>
+
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:Segoe UI, Arial; }
+
+body { display:flex; background:#f4f6f9; }
+
+/* SIDEBAR */
+.sidebar {
+  width:240px;
+  background:#111827;
+  color:white;
+  height:100vh;
+  padding:20px;
+}
+.sidebar h2 { margin-bottom:20px; }
+.sidebar a {
+  display:block;
+  padding:10px;
+  color:#bbb;
+  text-decoration:none;
+  border-radius:6px;
+}
+.sidebar a:hover { background:#1f2937; color:white; }
+
+/* MAIN */
+.main { flex:1; padding:20px; }
+
+/* HEADER */
+.header {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+/* CARD */
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:20px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* GRID */
+.grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+/* INPUT */
+input {
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border:1px solid #ddd;
+  border-radius:6px;
+}
+
+/* BUTTON */
+button {
+  padding:10px;
+  border:none;
+  background:#1a73e8;
+  color:white;
+  border-radius:6px;
+  cursor:pointer;
+}
+button:disabled { background:#999; }
+
+/* LIST */
+.list { margin-top:10px; }
+.item {
+  padding:8px;
+  border-bottom:1px solid #eee;
+}
+
+/* STATES */
+.state {
+  padding:10px;
+  color:#777;
+  text-align:center;
+}
+
+/* TOAST */
+#toast {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#111;
+  color:white;
+  padding:10px;
+  border-radius:6px;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>AcademiX</h2>
+  <a href="#students">Students</a>
+  <a href="#teachers">Teachers</a>
+  <a href="#fees">Fees</a>
+  <a href="#exams">Exams</a>
+  <a href="#results">Results</a>
+  <a href="#ai">AI</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="header">
+  <h2>Admin Dashboard</h2>
+  <div id="user-bar">Loading...</div>
+</div>
+
+<!-- STUDENTS -->
+<div class="card" id="students">
+  <h3>Students</h3>
+
+  <div class="grid">
+    <div>
+      <input id="student-name" placeholder="Name">
+      <input id="student-class" placeholder="Class">
+      <button id="btn-add-student" onclick="addStudent()">Save</button>
+    </div>
+
+    <div>
+      <input id="view-student-class" placeholder="Enter class">
+      <button onclick="viewStudents()">View</button>
+
+      <div id="students-state" class="state">No data loaded</div>
+      <div id="students-list" class="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TEACHERS -->
+<div class="card" id="teachers">
+  <h3>Teachers</h3>
+
+  <div class="grid">
+    <div>
+      <input id="teacher-name" placeholder="Name">
+      <input id="teacher-subject" placeholder="Subject">
+      <button onclick="addTeacher()">Save</button>
+    </div>
+
+    <div>
+      <input id="view-teacher-subject" placeholder="Subject">
+      <button onclick="viewTeachers()">View</button>
+
+      <div id="teachers-state" class="state"></div>
+      <div id="teachers-list" class="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEES -->
+<div class="card" id="fees">
+  <h3>Fees</h3>
+
+  <div class="grid">
+    <div>
+      <input id="fee-student" placeholder="Student">
+      <input id="fee-amount" placeholder="Amount">
+      <button onclick="addFee()">Save</button>
+    </div>
+
+    <div>
+      <input id="view-fee-student" placeholder="Student">
+      <button onclick="viewFees()">View</button>
+
+      <div id="fees-state" class="state"></div>
+      <div id="fees-list" class="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXAMS -->
+<div class="card" id="exams">
+  <h3>Exams</h3>
+
+  <div class="grid">
+    <div>
+      <input id="exam-title" placeholder="Title">
+      <input id="exam-class" placeholder="Class">
+      <button onclick="addExam()">Save</button>
+    </div>
+
+    <div>
+      <input id="view-exam-class" placeholder="Class">
+      <button onclick="viewExams()">View</button>
+
+      <div id="exams-state" class="state"></div>
+      <div id="exams-list" class="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div class="card" id="results">
+  <h3>Results</h3>
+
+  <div class="grid">
+    <div>
+      <input id="result-student" placeholder="Student">
+      <input id="result-class" placeholder="Class">
+      <input id="result-marks" placeholder="Marks">
+      <button onclick="addResult()">Save</button>
+    </div>
+
+    <div>
+      <input id="view-result-class" placeholder="Class">
+      <button onclick="viewResults()">View</button>
+
+      <div id="results-state" class="state"></div>
+      <div id="results-list" class="list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AI -->
+<div class="card" id="ai">
+  <h3>AI Analytics</h3>
+
+  <input id="ai-class" placeholder="Class">
+  <button onclick="fetchClassAnalytics()">Class AI</button>
+
+  <input id="ai-subject" placeholder="Subject">
+  <button onclick="fetchSubjectAnalytics()">Subject AI</button>
+
+  <div id="analytics-results" class="state"></div>
+</div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = "https://academix-backend-pe8o.onrender.com/api";
+const token = localStorage.getItem("token");
+
+if (!token) window.location.href = "login.html";
+
+// ===== USER LOAD =====
+async function loadUser() {
+  try {
+    const res = await fetch(API + "/me", {
+      headers: { Authorization: "Bearer " + token }
+    });
+    const user = await res.json();
+    document.getElementById("user-bar").innerText = user.name + " (" + user.plan + ")";
+  } catch {
+    document.getElementById("user-bar").innerText = "Error loading user";
+  }
+}
+
+// ===== TOAST =====
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(() => t.style.display = "none", 3000);
+}
+
+loadUser();
+</script>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
