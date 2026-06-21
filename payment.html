@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>AcademiX Payment</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6f9;
+padding:20px;
+}
+
+.card{
+background:white;
+max-width:400px;
+margin:auto;
+padding:25px;
+border-radius:12px;
+box-shadow:0 5px 20px #ddd;
+}
+
+input,button{
+width:100%;
+padding:12px;
+margin-top:12px;
+border-radius:8px;
+}
+
+input{
+border:1px solid #ddd;
+}
+
+button{
+border:none;
+background:#1a73e8;
+color:white;
+cursor:pointer;
+}
+
+button:disabled{
+background:gray;
+}
+
+#msg{
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h2>AcademiX Subscription</h2>
+
+
+<p id="planText"></p>
+
+
+<input 
+id="phone"
+placeholder="07XXXXXXXX">
+
+
+<button 
+id="payBtn"
+onclick="pay()">
+
+Pay with MPESA
+
+</button>
+
+
+<p id="msg"></p>
+
+
+</div>
+
+
+
+<script>
+
+
+const API =
+"https://academix-backend-pe8o.onrender.com/api";
+
+
+const TOKEN =
+localStorage.getItem("token");
+
+
+const SCHOOL_ID =
+localStorage.getItem("school_id");
+
+
+const ROLE =
+localStorage.getItem("role");
+
+
+
+if(!TOKEN || !SCHOOL_ID){
+
+alert("Please login first");
+
+location.href="login.html";
+
+}
+
+
+
+const params =
+new URLSearchParams(location.search);
+
+
+
+const plan =
+params.get("plan") || "basic";
+
+
+
+const prices={
+
+basic:1000,
+
+pro:2500,
+
+premium:5000
+
+};
+
+
+
+const amount =
+prices[plan];
+
+
+
+document
+.getElementById("planText")
+.innerText =
+"Plan: "+plan.toUpperCase()+
+" | KES "+amount;
+
+
+
+
+async function pay(){
+
+
+const phone =
+document
+.getElementById("phone")
+.value
+.trim();
+
+
+
+const msg =
+document.getElementById("msg");
+
+
+const btn =
+document.getElementById("payBtn");
+
+
+
+if(!phone){
+
+msg.innerText="Enter phone number";
+
+return;
+
+}
+
+
+
+btn.disabled=true;
+
+btn.innerText="Sending...";
+
+
+
+try{
+
+
+const res =
+await fetch(
+API+"/mpesa/stkpush",
+{
+
+method:"POST",
+
+headers:{
+
+
+"Content-Type":"application/json",
+
+"Authorization":
+"Bearer "+TOKEN
+
+},
+
+
+body:JSON.stringify({
+
+phone,
+
+amount,
+
+plan
+
+})
+
+});
+
+
+
+const data =
+await res.json();
+
+
+
+if(!res.ok){
+
+throw new Error(
+data.error || "Payment failed"
+);
+
+}
+
+
+
+if(data.success){
+
+
+msg.style.color="green";
+
+msg.innerText=
+"STK Push sent. Check your phone";
+
+
+setTimeout(()=>{
+
+location.href="admin.html";
+
+},3000);
+
+
+
+}else{
+
+
+throw new Error(
+"Payment not started"
+);
+
+}
+
+
+
+}catch(err){
+
+
+msg.style.color="red";
+
+msg.innerText=err.message;
+
+
+
+}
+
+
+
+btn.disabled=false;
+
+btn.innerText="Pay with MPESA";
+
+
+}
+
+
+
+
+</script>
+
+
+</body>
+</html>

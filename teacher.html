@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AcademiX Teacher Portal</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#1a73e8;
+color:white;
+padding:15px;
+}
+
+nav ul{
+display:flex;
+gap:15px;
+list-style:none;
+padding:0;
+flex-wrap:wrap;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+}
+
+main{
+padding:20px;
+display:grid;
+gap:20px;
+}
+
+section{
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+button{
+padding:10px;
+border:none;
+background:#1a73e8;
+color:white;
+border-radius:6px;
+cursor:pointer;
+margin-top:5px;
+}
+
+input, textarea, select{
+width:100%;
+padding:10px;
+margin-top:8px;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+ul{
+padding-left:20px;
+}
+
+#msg{
+color:red;
+}
+
+.hidden{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>👨‍🏫 Teacher Portal</h1>
+
+<nav>
+<ul>
+<li><a href="#exams">Exams</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#analytics">Analytics</a></li>
+<li><a href="#notifications">Notifications</a></li>
+</ul>
+</nav>
+</header>
+
+<p id="msg"></p>
+
+<main>
+
+<!-- EXAMS -->
+<section id="exams">
+<h2>📘 Manage Exams</h2>
+
+<button onclick="toggleForm('exam-form')">Add Exam</button>
+
+<div id="exam-form" class="hidden">
+
+<input id="exam-title" placeholder="Exam Title">
+<input id="exam-class" placeholder="Class">
+<input id="exam-subject" placeholder="Subject">
+<input id="exam-date" type="date">
+<input id="exam-syllabus" placeholder="Syllabus Link">
+
+<button onclick="addExam()">Save Exam</button>
+
+</div>
+
+<ul id="exams-list"></ul>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+<h2>📊 Manage Results</h2>
+
+<div id="results-list"></div>
+
+</section>
+
+<!-- ANALYTICS -->
+<section id="analytics">
+<h2>📈 Student Analytics</h2>
+
+<button onclick="fetchClassAnalytics()">Class Analytics</button>
+<button onclick="fetchSubjectAnalytics()">Subject Analytics</button>
+
+<div id="analytics-results"></div>
+
+</section>
+
+<!-- NOTIFICATIONS -->
+<section id="notifications">
+<h2>🔔 Notifications</h2>
+
+<button onclick="toggleForm('notif-form')">New Notification</button>
+
+<div id="notif-form" class="hidden">
+
+<input id="notification-user" placeholder="Student/Parent ID">
+<input id="notification-title" placeholder="Title">
+<textarea id="notification-message" placeholder="Message"></textarea>
+
+<select id="notification-category">
+<option value="General">General</option>
+<option value="Exam">Exam</option>
+<option value="Fee">Fee</option>
+<option value="AI">AI Tutor</option>
+</select>
+
+<button onclick="addNotification()">Send</button>
+
+</div>
+
+<ul id="notifications-list"></ul>
+</section>
+
+</main>
+
+<script src="teacher.js"></script>
+
+<script>
+function toggleForm(id){
+const el = document.getElementById(id);
+if(!el) return;
+el.classList.toggle("hidden");
+}
+</script>
+
+</body>
+</html>

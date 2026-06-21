@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AcademiX Student Portal</title>
+
+<style>
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+}
+
+header{
+background:#1a73e8;
+color:white;
+padding:15px;
+}
+
+nav ul{
+display:flex;
+gap:15px;
+list-style:none;
+padding:0;
+flex-wrap:wrap;
+}
+
+nav a{
+color:white;
+text-decoration:none;
+}
+
+main{
+padding:20px;
+display:grid;
+gap:20px;
+}
+
+section{
+background:white;
+padding:15px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+button{
+padding:10px;
+border:none;
+background:#1a73e8;
+color:white;
+border-radius:6px;
+cursor:pointer;
+}
+
+input{
+padding:10px;
+width:100%;
+margin-top:10px;
+border:1px solid #ddd;
+border-radius:6px;
+}
+
+ul{
+padding-left:20px;
+}
+
+#msg{
+color:red;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+<h1>🎓 Student Portal</h1>
+<nav>
+<ul>
+<li><a href="#exams">Exams</a></li>
+<li><a href="#results">Results</a></li>
+<li><a href="#fees">Fees</a></li>
+<li><a href="#ai-tutor">AI Tutor</a></li>
+<li><a href="#notifications">Notifications</a></li>
+</ul>
+</nav>
+</header>
+
+<p id="msg"></p>
+
+<main>
+
+<!-- EXAMS -->
+<section id="exams">
+<h2>📘 Exams</h2>
+<ul id="exams-list"></ul>
+</section>
+
+<!-- RESULTS -->
+<section id="results">
+<h2>📊 Results</h2>
+<ul id="results-list"></ul>
+</section>
+
+<!-- FEES -->
+<section id="fees">
+<h2>💰 Fees</h2>
+<ul id="fees-list"></ul>
+</section>
+
+<!-- AI -->
+<section id="ai-tutor">
+<h2>🤖 AI Tutor</h2>
+
+<form id="ai-form">
+<input id="question" placeholder="Ask your question..." required>
+<button type="submit">Ask</button>
+</form>
+
+<ul id="ai-responses"></ul>
+</section>
+
+<!-- NOTIFICATIONS -->
+<section id="notifications">
+<h2>🔔 Notifications</h2>
+<ul id="notifications-list"></ul>
+</section>
+
+</main>
+
+<script src="js/student.js"></script>
+
+</body>
+</html>

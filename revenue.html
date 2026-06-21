@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AcademiX Developer Revenue</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{
+font-family:Arial;
+background:#0f172a;
+color:white;
+padding:20px;
+}
+
+h1{
+color:#38bdf8;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:15px;
+margin-top:20px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:12px;
+text-align:center;
+}
+
+.big{
+font-size:24px;
+font-weight:bold;
+color:#22c55e;
+}
+
+table{
+width:100%;
+margin-top:20px;
+border-collapse:collapse;
+background:#1e293b;
+}
+
+th,td{
+padding:10px;
+border:1px solid #334155;
+}
+
+#msg{
+color:#f87171;
+margin-top:10px;
+}
+</style>
+
+</head>
+
+<body>
+
+<h1>💰 Developer Revenue Dashboard</h1>
+
+<p id="msg"></p>
+
+<div class="grid">
+
+<div class="card">
+Total Schools
+<div class="big" id="total">0</div>
+</div>
+
+<div class="card">
+Active Schools
+<div class="big" id="active">0</div>
+</div>
+
+<div class="card">
+Revenue
+<div class="big" id="revenue">0 KES</div>
+</div>
+
+<div class="card">
+Basic
+<div class="big" id="basic">0</div>
+</div>
+
+<div class="card">
+Pro
+<div class="big" id="pro">0</div>
+</div>
+
+<div class="card">
+Premium
+<div class="big" id="premium">0</div>
+</div>
+
+</div>
+
+<h2>Recent Payments</h2>
+
+<table>
+<thead>
+<tr>
+<th>School</th>
+<th>Amount</th>
+<th>Status</th>
+<th>Receipt</th>
+</tr>
+</thead>
+
+<tbody id="payments"></tbody>
+</table>
+
+<script>
+
+const API = "https://academix-backend-pe8o.onrender.com/api";
+
+const TOKEN = localStorage.getItem("token");
+const ROLE = localStorage.getItem("role");
+
+/* =========================
+   DEV ACCESS CONTROL
+========================= */
+if(!TOKEN || (ROLE !== "superadmin" && ROLE !== "developer")){
+    alert("Access denied");
+    location.href = "login.html";
+}
+
+/* =========================
+   SECURE FETCH
+========================= */
+async function secureFetch(url){
+
+try{
+
+const res = await fetch(url,{
+headers:{
+Authorization:"Bearer "+TOKEN
+}
+});
+
+const data = await res.json();
+
+if(!res.ok){
+throw new Error(data.error || "Request failed");
+}
+
+return data;
+
+}catch(err){
+document.getElementById("msg").innerText = err.message;
+return null;
+}
+
+}
+
+/* =========================
+   LOAD REVENUE
+========================= */
+async function loadRevenue(){
+
+const data = await secureFetch(API+"/admin/revenue");
+
+if(!data) return;
+
+document.getElementById("total").innerText = data.total_schools || 0;
+document.getElementById("active").innerText = data.active || 0;
+document.getElementById("revenue").innerText = (data.revenue || 0) + " KES";
+
+document.getElementById("basic").innerText = data.plans?.basic || 0;
+document.getElementById("pro").innerText = data.plans?.pro || 0;
+document.getElementById("premium").innerText = data.plans?.premium || 0;
+
+const table = document.getElementById("payments");
+table.innerHTML = "";
+
+(data.recent_payments || []).forEach(p => {
+table.innerHTML += `
+<tr>
+<td>${p.school_id}</td>
+<td>${p.amount}</td>
+<td>${p.status}</td>
+<td>${p.receipt || "-"}</td>
+</tr>
+`;
+});
+
+}
+
+loadRevenue();
+setInterval(loadRevenue, 10000);
+
+</script>
+
+</body>
+</html>

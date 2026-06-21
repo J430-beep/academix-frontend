@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Create School - AcademiX</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:linear-gradient(135deg,#0d47a1,#1a73e8);
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+
+.card{
+
+background:white;
+width:360px;
+padding:25px;
+border-radius:14px;
+box-shadow:0 10px 30px #0004;
+
+}
+
+
+h2{
+
+text-align:center;
+color:#1a73e8;
+
+}
+
+
+input{
+
+width:100%;
+padding:12px;
+margin:8px 0;
+border:1px solid #ddd;
+border-radius:8px;
+
+}
+
+
+
+button{
+
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:8px;
+background:#1a73e8;
+color:white;
+cursor:pointer;
+font-weight:bold;
+
+}
+
+
+
+button:disabled{
+
+background:gray;
+
+}
+
+
+
+#msg{
+
+text-align:center;
+margin-top:10px;
+
+}
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h2>
+Create School
+</h2>
+
+
+<input 
+id="name"
+placeholder="School Name">
+
+
+
+<input
+id="email"
+type="email"
+placeholder="Admin Email">
+
+
+
+<input
+id="password"
+type="password"
+placeholder="Admin Password">
+
+
+
+<button
+id="btn"
+onclick="registerSchool()">
+
+Create School
+
+</button>
+
+
+
+<p id="msg"></p>
+
+
+</div>
+
+
+
+
+
+
+<script>
+
+
+const API =
+"https://academix-backend-pe8o.onrender.com/api";
+
+
+
+
+
+async function registerSchool(){
+
+
+const btn =
+document.getElementById("btn");
+
+
+const msg =
+document.getElementById("msg");
+
+
+
+const name =
+document.getElementById("name").value.trim();
+
+
+const email =
+document.getElementById("email").value.trim();
+
+
+const password =
+document.getElementById("password").value.trim();
+
+
+
+
+if(!name || !email || !password){
+
+msg.innerText =
+"Fill all fields";
+
+msg.style.color="red";
+
+return;
+
+}
+
+
+
+
+if(password.length < 6){
+
+msg.innerText =
+"Password must be 6+ characters";
+
+msg.style.color="red";
+
+return;
+
+}
+
+
+
+
+
+try{
+
+
+btn.disabled=true;
+
+btn.innerText="Creating...";
+
+
+
+
+const response =
+await fetch(
+API+"/schools/register",
+{
+
+method:"POST",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+
+body: JSON.stringify({
+    name: name,
+    admin_email: email,
+    admin_password: password,
+
+    mpesa_shortcode: "",
+    mpesa_passkey: "",
+    consumer_key: "",
+    consumer_secret: ""
+})
+
+
+});
+
+
+
+
+
+const data =
+await response.json();
+
+
+
+
+if(!response.ok){
+
+throw new Error(
+data.error || "Registration failed"
+);
+
+}
+
+
+
+
+
+// SAVE SCHOOL ID IF RETURNED
+
+if(data.school_id){
+
+localStorage.setItem(
+"school_id",
+data.school_id
+);
+
+}
+
+
+
+
+msg.innerText =
+"School created successfully ✔";
+
+
+msg.style.color="green";
+
+
+
+
+
+setTimeout(()=>{
+
+
+window.location.href =
+"login.html";
+
+
+},1500);
+
+
+
+
+}catch(err){
+
+
+msg.innerText =
+err.message;
+
+
+msg.style.color="red";
+
+
+
+}finally{
+
+
+btn.disabled=false;
+
+btn.innerText="Create School";
+
+
+}
+
+
+}
+
+
+
+
+</script>
+
+
+</body>
+</html>

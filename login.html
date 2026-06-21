@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AcademiX Login</title>
+
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+background:linear-gradient(135deg,#0d47a1,#1a73e8);
+}
+
+
+.card{
+
+background:white;
+width:360px;
+padding:25px;
+border-radius:14px;
+box-shadow:0 10px 30px #0004;
+
+}
+
+
+h2{
+text-align:center;
+color:#1a73e8;
+}
+
+
+input{
+
+width:100%;
+padding:12px;
+margin:8px 0;
+border:1px solid #ddd;
+border-radius:8px;
+
+}
+
+
+
+button{
+
+width:100%;
+padding:12px;
+border:none;
+border-radius:8px;
+background:#1a73e8;
+color:white;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+
+button:disabled{
+background:gray;
+}
+
+
+
+#otpBox{
+display:none;
+}
+
+
+
+#msg{
+
+text-align:center;
+margin-top:10px;
+
+}
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<div class="card">
+
+
+<h2>AcademiX Login</h2>
+
+
+
+<div id="loginBox">
+
+
+<input
+id="email"
+type="email"
+placeholder="Email">
+
+
+
+<input
+id="password"
+type="password"
+placeholder="Password">
+
+
+
+<button id="loginBtn" onclick="login()">
+
+Login
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div id="otpBox">
+
+
+<input
+id="otp"
+placeholder="Enter OTP">
+
+
+
+<button onclick="verifyOTP()">
+
+Verify
+
+</button>
+
+
+</div>
+
+
+
+
+<p id="msg"></p>
+
+
+
+</div>
+
+
+
+
+<script>
+
+
+const API =
+"https://academix-backend-pe8o.onrender.com/api";
+
+
+
+let temp_token=null;
+
+
+
+
+
+// already logged in
+
+if(localStorage.getItem("token")){
+
+window.location.href="admin.html";
+
+}
+
+
+
+
+
+function message(text,color){
+
+const msg =
+document.getElementById("msg");
+
+msg.innerText=text;
+msg.style.color=color;
+
+}
+
+
+
+
+
+async function login(){
+
+
+const email =
+document.getElementById("email").value.trim();
+
+
+const password =
+document.getElementById("password").value.trim();
+
+
+
+if(!email || !password){
+
+return message(
+"Enter email and password",
+"red"
+);
+
+}
+
+
+
+const btn =
+document.getElementById("loginBtn");
+
+
+btn.disabled=true;
+
+btn.innerText="Checking...";
+
+
+
+try{
+
+
+const res =
+await fetch(
+API+"/auth/request-otp",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+
+body:JSON.stringify({
+
+email,
+password
+
+})
+
+});
+
+
+
+
+const data =
+await res.json();
+
+
+
+if(!res.ok){
+
+throw new Error(
+data.error || "Login failed"
+);
+
+}
+
+
+
+
+temp_token=data.temp_token;
+
+
+
+message(
+"OTP sent",
+"green"
+);
+
+
+
+document.getElementById("loginBox")
+.style.display="none";
+
+
+document.getElementById("otpBox")
+.style.display="block";
+
+
+
+}catch(err){
+
+message(
+err.message,
+"red"
+);
+
+
+
+}finally{
+
+
+btn.disabled=false;
+
+btn.innerText="Login";
+
+
+}
+
+}
+
+
+
+
+
+
+async function verifyOTP(){
+
+
+const otp =
+document.getElementById("otp").value.trim();
+
+
+
+if(!otp){
+
+return message(
+"Enter OTP",
+"red"
+);
+
+}
+
+
+
+try{
+
+
+const res =
+await fetch(
+API+"/auth/verify-otp",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+
+body:JSON.stringify({
+
+temp_token,
+otp
+
+})
+
+});
+
+
+
+
+const data =
+await res.json();
+
+
+
+if(!res.ok){
+
+throw new Error(
+data.error || "Invalid OTP"
+);
+
+}
+
+
+
+
+localStorage.setItem(
+"token",
+data.token
+);
+
+
+
+localStorage.setItem(
+"role",
+data.role
+);
+
+
+
+localStorage.setItem(
+"school_id",
+data.school_id
+);
+
+
+
+
+message(
+"Login successful",
+"green"
+);
+
+
+
+
+
+setTimeout(()=>{
+
+
+if(data.role==="admin"){
+
+window.location.href="admin.html";
+
+}
+
+else if(data.role==="teacher"){
+
+window.location.href="teacher.html";
+
+}
+
+else{
+
+window.location.href="student.html";
+
+}
+
+
+
+},800);
+
+
+
+
+
+}catch(err){
+
+
+message(
+err.message,
+"red"
+);
+
+
+}
+
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
